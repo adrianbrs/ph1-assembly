@@ -1,0 +1,9 @@
+REGEX LINE
+^\s{0,}?(?:(?:(\w+):)\s+)?(\w+)(?:\s+(\w+))?(?:[\s]+|(?:\s*;.*).*)?$
+
+
+Se o regex não encontrar nenhum grupo
+    Se a linha estiver vazia
+        apenas continua
+    Se não
+        erro no número de operandos
