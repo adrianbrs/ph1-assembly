@@ -1,6 +1,8 @@
 package decoder
 
-import "log"
+import (
+	"fmt"
+)
 
 type metaInstruction struct {
 	opCode string
@@ -29,12 +31,12 @@ var operations = map[string]*metaInstruction{
 
 // Decode traduz o mnemônico de uma instrução e retorna
 // seu opcode e tamanho
-func Decode(name string) (string, int) {
+func Decode(name string) (string, int, error) {
 	instruction := operations[name]
 
 	if instruction == nil {
-		log.Panicf("None instruction found for this name: %s", name)
+		return "", 0, fmt.Errorf("None instruction found for this name: %s", name)
 	}
 
-	return instruction.opCode, instruction.size
+	return instruction.opCode, instruction.size, nil
 }

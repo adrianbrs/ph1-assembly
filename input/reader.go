@@ -19,6 +19,7 @@ type SourceLine struct {
 	Label   string
 	Name    string
 	Operand string
+	Address int
 }
 
 // Source contém as informações do código fonte

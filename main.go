@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"os"
+	"ph1-assembly/extractor"
 	"ph1-assembly/input"
 	"strings"
 )
@@ -16,9 +16,7 @@ func Mount(opt *Options) {
 		panic("Cannot read input file")
 	}
 
-	for _, srcLine := range source.Contents {
-		fmt.Printf("%s: %s %s\n", srcLine.Label, srcLine.Name, srcLine.Operand)
-	}
+	extractor.ExtractLabels(source.Contents)
 }
 
 func main() {
