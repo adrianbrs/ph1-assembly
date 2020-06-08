@@ -22,6 +22,8 @@ func Mount(opt *Options) {
 	source, err := input.ReadSource(opt.Input)
 
 	if err != nil {
+		// Validação para permitir que o usuário tente mais vezes caso o nome do arquivo esteja
+		// errado
 		for err != nil {
 			fmt.Print("Cannot read input file, please try again: ")
 			fmt.Scanln(&opt.Input)
@@ -29,8 +31,11 @@ func Mount(opt *Options) {
 		}
 	}
 
+	// Primeira passagem: labels
 	labels := extractor.ExtractLabels(source.Contents)
+	// Segunda passagem: instruções
 	instructions := extractor.ExtractInstructions(source.Contents, labels)
+	// Gera o arquivo de saída a partir do nome definido no options
 	output.CreateOutputFile(instructions, opt.Output)
 }
 

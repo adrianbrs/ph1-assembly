@@ -15,8 +15,8 @@ func CreateOutputFile(instruction []extractor.Instruction, outPutName string) {
 	}
 
 	// Para cada instructionValue contido na slice instruction escreve seu endereço e seu opCode, caso seja
-	// uma instrução de dois bytes incrementa o endereço para manter a continuidade
-	// e escreve o endereço onde está contido seu valor
+	// uma instrução de dois bytes verifica os valores contidos no atributo Data da instrução e escreve seus
+	// valores
 	for _, instructionValue := range instruction {
 		outputFile.WriteString(fmt.Sprintf("%02X %s\n", instructionValue.Address, instructionValue.OpCode))
 		if instructionValue.HasOperand {
