@@ -1,11 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"ph1-assembly/extractor"
 	"ph1-assembly/input"
+	"ph1-assembly/output"
 	"strings"
 )
+
+// Options armazenam as opções do montador
+type Options struct {
+	Input    string
+	Output   string
+	Compress bool
+}
 
 // Mount lê um arquivo fonte em assembly PH1 e monta para linguagem de máquina
 // no padrão do emulador PH1
@@ -13,10 +22,16 @@ func Mount(opt *Options) {
 	source, err := input.ReadSource(opt.Input)
 
 	if err != nil {
-		panic("Cannot read input file")
+		for err != nil {
+			fmt.Print("Cannot read input file, please try again: ")
+			fmt.Scanln(&opt.Input)
+			fmt.Println()
+		}
 	}
 
-	extractor.ExtractLabels(source.Contents)
+	labels := extractor.ExtractLabels(source.Contents)
+	instructions := extractor.ExtractInstructions(source.Contents, labels)
+	output.CreateOutputFile(instructions)
 }
 
 func main() {

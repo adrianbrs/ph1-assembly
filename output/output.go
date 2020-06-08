@@ -3,18 +3,11 @@ package output
 import (
 	"fmt"
 	"os"
+	"ph1-assembly/extractor"
 )
 
-//Instruction representa uma instrução
-type Instruction struct {
-	Address    int
-	OpCode     string
-	Value      int
-	HasOperand bool
-}
-
 // CreateOutputFile cria e preenche o arquivo com todas as instruções
-func CreateOutputFile(instruction []Instruction) {
+func CreateOutputFile(instruction []extractor.Instruction) {
 	outputFile, err := os.Create("outputFile.phu")
 
 	if err != nil {
@@ -27,8 +20,8 @@ func CreateOutputFile(instruction []Instruction) {
 	for _, instructionValue := range instruction {
 		outputFile.WriteString(fmt.Sprintf("%02X %s\n", instructionValue.Address, instructionValue.OpCode))
 		if instructionValue.HasOperand {
-			outputFile.WriteString(fmt.Sprintf("%02X %02X\n", instructionValue.Address+1,
-				instructionValue.Value))
+			outputFile.WriteString(fmt.Sprintf("%02X %02X\n", instructionValue.Data.Address,
+				instructionValue.Data.Value))
 		}
 	}
 }
