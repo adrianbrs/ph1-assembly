@@ -31,7 +31,7 @@ func Mount(opt *Options) {
 
 	labels := extractor.ExtractLabels(source.Contents)
 	instructions := extractor.ExtractInstructions(source.Contents, labels)
-	output.CreateOutputFile(instructions)
+	output.CreateOutputFile(instructions, opt.Output)
 }
 
 func main() {

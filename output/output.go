@@ -7,8 +7,8 @@ import (
 )
 
 // CreateOutputFile cria e preenche o arquivo com todas as instruções
-func CreateOutputFile(instruction []extractor.Instruction) {
-	outputFile, err := os.Create("outputFile.phu")
+func CreateOutputFile(instruction []extractor.Instruction, outPutName string) {
+	outputFile, err := os.Create(outPutName)
 
 	if err != nil {
 		panic(err)
