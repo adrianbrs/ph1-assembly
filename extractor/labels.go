@@ -7,7 +7,9 @@ import (
 
 // ExtractLabels efetua a primeira passagem no código, guardando os rótulos
 // e seus endereços em um map que irá retornar
-func ExtractLabels(contents []*input.SourceLine) (labelMap map[string]int) {
+func ExtractLabels(contents []*input.SourceLine) map[string]int {
+
+	var labelMap = make(map[string]int)
 
 	sections := map[string]int{
 		"text": 0,
@@ -36,5 +38,5 @@ func ExtractLabels(contents []*input.SourceLine) (labelMap map[string]int) {
 		}
 	}
 
-	return
+	return labelMap
 }
