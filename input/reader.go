@@ -3,7 +3,6 @@ package input
 import (
 	"bufio"
 	"os"
-	"ph1-assembly/constants"
 	"regexp"
 	"strings"
 )
@@ -63,7 +62,7 @@ func parseSourceLine(line string) (srcLine *SourceLine) {
 	match := lineMatchRegex.FindStringSubmatch(line)
 
 	if len(match) == 0 {
-		panic(constants.InvalidOperandCount)
+		panic("Invalid operand count")
 	}
 
 	// Instantcia um novo SourceLine

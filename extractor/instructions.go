@@ -1,10 +1,8 @@
 package extractor
 
 import (
-	"ph1-assembly/constants"
 	"ph1-assembly/decoder"
 	"ph1-assembly/input"
-	"strconv"
 )
 
 //Instruction representa uma instrução
@@ -23,15 +21,10 @@ type Data struct {
 
 //ExtractInstructions efetua a segunda passagem no código, guardando as
 // instrucoes em uma lista de struct
-func ExtractInstructions(contents []*input.SourceLine, labelMap map[string]int) []Instruction {
-	var instructions = make([]Instruction, 0)
-
+func ExtractInstructions(contents []*input.SourceLine, labelMap map[string]int) (instructions []Instruction) {
+	// Contador de endereço
+	var address int = 0
 	for _, srcLine := range contents {
-
-		if srcLine.Name == constants.TextSection || srcLine.Name == constants.DataSection {
-			break
-		}
-
 		opCode, size, err := decoder.Decode(srcLine.Name)
 
 		if err != nil {
@@ -40,33 +33,27 @@ func ExtractInstructions(contents []*input.SourceLine, labelMap map[string]int) 
 
 		// Cria instrução sem operando
 		instruction := &Instruction{
-			Address: srcLine.Address,
+			Address: address,
 			OpCode:  opCode,
 		}
 
-		// Verifica se o valor retornado da decodificação para aquela instrução é 1 ou 2
-		if size == 2 {
+		// Verifica se o valor retornado da decodificação para aquela instrução é 0 ou 1
+		if size == 1 {
 			instruction.HasOperand = true
 			// Busca nos labels o valor do operando
-			operandValue, found := labelMap[srcLine.Operand]
-
-			if found == false {
-				operandValue, err = strconv.Atoi(srcLine.Operand)
-
-				if err != nil {
-					panic(constants.LabelNotFound)
-				}
-			}
+			operandValue := labelMap[srcLine.Operand]
 
 			instruction.Data.Value = operandValue
 
-			instruction.Data.Address = srcLine.Address + 1
+			// O endereço do operando é sempre um após sua instrução, para manter a contuinidade da contagem
+			// é preciso incrementar um
+			instruction.Data.Address = address + 1
+			address++
 		}
 
 		// Adiciona a instrução na lista e executa o laço novamente
 		instructions = append(instructions, *instruction)
 
 	}
-
-	return instructions
+	return
 }
