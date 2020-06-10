@@ -7,7 +7,7 @@ import (
 )
 
 // CreateOutputFile cria e preenche o arquivo com todas as instruções
-func CreateOutputFile(instruction []extractor.Instruction, outPutName string) {
+func CreateOutputFile(instruction []extractor.Instruction, data []extractor.Data, outPutName string) {
 	outputFile, err := os.Create(outPutName)
 
 	if err != nil {
@@ -23,5 +23,10 @@ func CreateOutputFile(instruction []extractor.Instruction, outPutName string) {
 			outputFile.WriteString(fmt.Sprintf("%02X %02X\n", instructionValue.Data.Address,
 				instructionValue.Data.Value))
 		}
+	}
+	outputFile.WriteString("\n")
+
+	for _, dataValue := range data {
+		outputFile.WriteString(fmt.Sprintf("%02X %02X\n", dataValue.Address, dataValue.Value))
 	}
 }

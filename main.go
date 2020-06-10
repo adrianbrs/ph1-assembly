@@ -38,10 +38,10 @@ func Mount(opt *Options) {
 	labels := extractor.ExtractLabels(source)
 
 	// Segunda passagem: instruções
-	instructions := extractor.ExtractInstructions(source.Text, labels)
+	instructions, data := extractor.ExtractInstructionsAndData(source, labels)
 
 	// Gera o arquivo de saída a partir do nome definido no options
-	output.CreateOutputFile(instructions, opt.Output)
+	output.CreateOutputFile(*instructions, *data, opt.Output)
 }
 
 func main() {
