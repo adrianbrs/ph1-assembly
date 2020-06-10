@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"os"
 	"ph1-assembly/constants"
+	"ph1-assembly/decoder"
+	"ph1-assembly/pherror"
 	"regexp"
 	"strings"
 )
@@ -17,16 +19,38 @@ var (
 
 // SourceLine contém os dados necessários de uma linha do código fonte
 type SourceLine struct {
-	Label   string
-	Name    string
-	Operand string
-	Address int
+	Label      string
+	Name       string
+	Operand    string
+	LineNumber int
+	Address    int
 }
 
 // Source contém as informações do código fonte
 type Source struct {
-	Filename string
-	Contents []*SourceLine
+	Filename           string
+	Text               []*SourceLine
+	Data               []*SourceLine
+	CurrentTextAddress int
+	CurrentDataAddress int
+}
+
+// AppendText adiciona uma nova linha na seção text, atribuindo
+// seu endereço e validando a instrução
+func (src *Source) AppendText(line *SourceLine) {
+	_, size := decoder.DecodeText(line.Name)
+	line.Address = src.CurrentTextAddress
+	src.Text = append(src.Text, line)
+	src.CurrentTextAddress += size
+}
+
+// AppendData adiciona uma nova linha na seção data, atribuindo
+// seu endereço e validando o tipo de dado
+func (src *Source) AppendData(line *SourceLine) {
+	size := decoder.DecodeData(line.Name)
+	line.Address = src.CurrentDataAddress
+	src.Data = append(src.Data, line)
+	src.CurrentDataAddress += size
 }
 
 // ReadSource lê o codigo fonte e transforma para o tipo Source
@@ -37,11 +61,43 @@ func ReadSource(filename string) (source *Source, err error) {
 		return
 	}
 
-	source = &Source{Filename: filename}
+	source = &Source{
+		Filename:           filename,
+		CurrentTextAddress: constants.TextSectionAddress,
+		CurrentDataAddress: constants.DataSectionAddress,
+	}
 
-	for _, line := range contents {
+	// Seção atual do código (text ou data)
+	var section string
+
+	// Cria um erro relacionado ao arquivo
+	fileError := &pherror.ErrorType{Filename: filename}
+
+	// Lẽ cada linha salvanda na seção atual
+	for lineNumber, line := range contents {
+		// Atualiza a linha atual do erro de arquivo
+		fileError.LineNumber = lineNumber + 1
+
+		// Faz uma validação previa da linha
 		if validateSourceLine(line) {
-			source.Contents = append(source.Contents, parseSourceLine(line))
+
+			// Extrai os dados da linha atual
+			sourceLine := parseSourceLine(line)
+			sourceLine.LineNumber = lineNumber + 1
+
+			// Verifica a seção atual
+			if strings.ToUpper(sourceLine.Name) == strings.ToUpper(constants.TextSection) {
+				section = constants.TextSection
+			} else if strings.ToUpper(sourceLine.Name) == strings.ToUpper(constants.DataSection) {
+				section = constants.DataSection
+			} else if section == constants.TextSection {
+				source.AppendText(sourceLine)
+			} else if section == constants.DataSection {
+				source.AppendData(sourceLine)
+			} else {
+				err := pherror.Join(pherror.DecoratorNotFound, fileError)
+				panic(pherror.Format(err, sourceLine.Name))
+			}
 		}
 	}
 
@@ -63,7 +119,7 @@ func parseSourceLine(line string) (srcLine *SourceLine) {
 	match := lineMatchRegex.FindStringSubmatch(line)
 
 	if len(match) == 0 {
-		panic(constants.InvalidOperandCount)
+		panic(pherror.InvalidOperandCount)
 	}
 
 	// Instantcia um novo SourceLine

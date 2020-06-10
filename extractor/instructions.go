@@ -4,6 +4,7 @@ import (
 	"ph1-assembly/constants"
 	"ph1-assembly/decoder"
 	"ph1-assembly/input"
+	"ph1-assembly/pherror"
 	"strconv"
 )
 
@@ -23,20 +24,16 @@ type Data struct {
 
 //ExtractInstructions efetua a segunda passagem no código, guardando as
 // instrucoes em uma lista de struct
-func ExtractInstructions(contents []*input.SourceLine, labelMap map[string]int) []Instruction {
+func ExtractInstructions(textContent []*input.SourceLine, labelMap map[string]int) []Instruction {
 	var instructions = make([]Instruction, 0)
 
-	for _, srcLine := range contents {
+	for _, srcLine := range textContent {
 
 		if srcLine.Name == constants.TextSection || srcLine.Name == constants.DataSection {
-			break
+			continue
 		}
 
-		opCode, size, err := decoder.Decode(srcLine.Name)
-
-		if err != nil {
-			panic(err)
-		}
+		opCode, size := decoder.DecodeText(srcLine.Name)
 
 		// Cria instrução sem operando
 		instruction := &Instruction{
@@ -51,10 +48,11 @@ func ExtractInstructions(contents []*input.SourceLine, labelMap map[string]int) 
 			operandValue, found := labelMap[srcLine.Operand]
 
 			if found == false {
+				var err error
 				operandValue, err = strconv.Atoi(srcLine.Operand)
 
 				if err != nil {
-					panic(constants.LabelNotFound)
+					panic(pherror.Format(pherror.LabelNotFound, srcLine.Operand))
 				}
 			}
 

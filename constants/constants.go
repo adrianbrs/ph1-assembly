@@ -4,15 +4,16 @@ const (
 	//TextSection texto para seção text
 	TextSection = "text"
 
+	//TextSectionAddress endereço início das instruções
+	TextSectionAddress = 0
+
 	//DataSection texto para seção data
 	DataSection = "data"
 
-	//LabelNotFound erro de label não encontrada
-	LabelNotFound = "Label not found"
+	//DataSectionAddress endereço início das instruções
+	DataSectionAddress = 128
 
-	//NoneInstructionFound erro de nome de instrução não encontrado
-	NoneInstructionFound = "None instruction found for this name: %s"
-
-	//InvalidOperandCount erro de quantidade de operadores invalidas
-	InvalidOperandCount = "Invalid operand count"
+	// MaxErrorCodeDigits define a quantidade máxima de digitos para
+	// o código de um erro do montador
+	MaxErrorCodeDigits = 3
 )
