@@ -1,11 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"ph1-assembly/extractor"
 	"ph1-assembly/input"
 	"ph1-assembly/output"
+	"ph1-assembly/pherror"
 	"strings"
 )
 
@@ -19,29 +22,44 @@ type Options struct {
 // Mount lê um arquivo fonte em assembly PH1 e monta para linguagem de máquina
 // no padrão do emulador PH1
 func Mount(opt *Options) {
+	// Validação para permitir que o usuário tente mais vezes caso o nome do arquivo esteja
+	// errado
 	source, err := input.ReadSource(opt.Input)
-
-	if err != nil {
-		// Validação para permitir que o usuário tente mais vezes caso o nome do arquivo esteja
-		// errado
-		for err != nil {
-			fmt.Print("Cannot read input file, please try again: ")
-			fmt.Scanln(&opt.Input)
-			fmt.Println()
+	for err != nil {
+		var perr *os.PathError
+		if errors.As(err, &perr) {
+			panic(pherror.Format(pherror.FileNotFound, opt.Input))
+		} else {
+			panic(pherror.Format(pherror.CannotOpenFile, opt.Input))
 		}
 	}
 
 	// Primeira passagem: labels
-	labels := extractor.ExtractLabels(source.Contents)
+	labels := extractor.ExtractLabels(source)
+
 	// Segunda passagem: instruções
-	instructions := extractor.ExtractInstructions(source.Contents, labels)
+	instructions := extractor.ExtractInstructions(source.Text, labels)
+
 	// Gera o arquivo de saída a partir do nome definido no options
 	output.CreateOutputFile(instructions, opt.Output)
 }
 
 func main() {
+	// Tratamento de erro
+	defer func() {
+		if err := recover(); err != nil {
+			pherr := pherror.Format(err)
+			fmt.Println(pherr)
+
+			if pherr.Code != 0 {
+				os.Exit(pherr.Code)
+			}
+			os.Exit(1)
+		}
+	}()
+
 	if len(os.Args) < 2 {
-		panic("Informe o nome do arquivo")
+		panic(pherror.MissingInputFile)
 	}
 	var input, output string
 
@@ -54,7 +72,7 @@ func main() {
 	} else {
 
 		// Gera o output através do nome do arquivo
-		output = strings.Split(input, ".")[0] + ".ph1"
+		output = strings.Split(filepath.Base(input), ".")[0] + ".ph1"
 	}
 
 	options := &Options{

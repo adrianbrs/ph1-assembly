@@ -1,8 +1,7 @@
 package decoder
 
 import (
-	"fmt"
-	"ph1-assembly/constants"
+	"ph1-assembly/pherror"
 )
 
 type metaInstruction struct {
@@ -30,14 +29,19 @@ var operations = map[string]*metaInstruction{
 	"HLT": &metaInstruction{opCode: "F0", size: 1},
 }
 
-// Decode traduz o mnemônico de uma instrução e retorna
+// DecodeText traduz o mnemônico de uma instrução e retorna
 // seu opcode e tamanho
-func Decode(name string) (string, int, error) {
+func DecodeText(name string) (string, int) {
 	instruction := operations[name]
 
 	if instruction == nil {
-		return "", 0, fmt.Errorf(constants.NoneInstructionFound, name)
+		panic(pherror.Format(pherror.NoneInstructionFound, name))
 	}
 
-	return instruction.opCode, instruction.size, nil
+	return instruction.opCode, instruction.size
+}
+
+// DecodeData decodifica um tipo de dados, retornando seu tamanho em bytes
+func DecodeData(name string) (size int) {
+	return 1
 }
