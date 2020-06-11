@@ -5,6 +5,13 @@ import (
 	"ph1-assembly/constants"
 )
 
+var inputFileName string
+
+// Setup inicializa os valores para os logs de erro
+func Setup(filename string) {
+	inputFileName = filename
+}
+
 // ErrorType é utilizado para erros relacionados ao montador
 type ErrorType struct {
 	Message    string
@@ -25,15 +32,25 @@ func (err *ErrorType) Error() string {
 	}
 
 	// Verifica se há um nome de arquivo no erro
-	if err.Filename != "" {
-		msg += " in %s"
-		args = append(args, err.Filename)
-	}
+	if err.Filename != "" || err.LineNumber != 0 {
+		var filename string
 
-	// Verifica se há um número de linha informado no erro
-	if err.LineNumber != 0 {
-		msg += ":%d"
-		args = append(args, err.LineNumber)
+		if err.Filename != "" {
+			filename = err.Filename
+		} else if inputFileName != "" {
+			filename = inputFileName
+		}
+
+		if filename != "" {
+			msg += " in %s"
+			args = append(args, filename)
+
+			// Verifica se há um número de linha informado no erro
+			if err.LineNumber != 0 {
+				msg += ":%d"
+				args = append(args, err.LineNumber)
+			}
+		}
 	}
 
 	// Formata a mensagem e retorna o texto formatado do erro

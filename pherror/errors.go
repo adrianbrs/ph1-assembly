@@ -37,10 +37,17 @@ var (
 		Message: "Invalid operand count",
 	}
 
+	// InvalidOperandValue erro retornado quando o operando de uma instrução ou data
+	// não é reconhecido
+	InvalidOperandValue = &ErrorType{
+		Code:    7,
+		Message: "Invalid operand \"%s\"",
+	}
+
 	//DecoratorNotFound erro retornado ao não encontrar nenhuma instrução ou
 	// decorador com o nome informado
 	DecoratorNotFound = &ErrorType{
-		Code:    7,
+		Code:    8,
 		Message: "Decorator or instruction not found for \"%s\"",
 	}
 )

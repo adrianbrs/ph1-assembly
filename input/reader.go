@@ -2,6 +2,7 @@ package input
 
 import (
 	"bufio"
+	"errors"
 	"os"
 	"ph1-assembly/constants"
 	"ph1-assembly/decoder"
@@ -24,6 +25,17 @@ type SourceLine struct {
 	Operand    string
 	LineNumber int
 	Address    int
+}
+
+// Errorf retorna uma instância de ErrorType contendo as informações da linha
+func (line *SourceLine) Errorf(msg interface{}, args ...interface{}) *pherror.ErrorType {
+	pherr := &pherror.ErrorType{LineNumber: line.LineNumber}
+	if errType, ok := msg.(*pherror.ErrorType); ok {
+		pherr = pherror.Join(pherr, errType)
+	} else if errMsg, ok := msg.(string); ok {
+		pherr.Message = errMsg
+	}
+	return pherror.Format(pherr, args...)
 }
 
 // Source contém as informações do código fonte
@@ -54,11 +66,17 @@ func (src *Source) AppendData(line *SourceLine) {
 }
 
 // ReadSource lê o codigo fonte e transforma para o tipo Source
-func ReadSource(filename string) (source *Source, err error) {
+func ReadSource(filename string) (source *Source) {
 	contents, err := read(filename)
 
+	// Verifica se houve algum erro na leitura do arquivo
 	if err != nil {
-		return
+		var perr *os.PathError
+		if errors.As(err, &perr) {
+			panic(pherror.Format(pherror.FileNotFound, filename))
+		} else {
+			panic(pherror.Format(pherror.CannotOpenFile, filename))
+		}
 	}
 
 	source = &Source{
@@ -95,8 +113,7 @@ func ReadSource(filename string) (source *Source, err error) {
 			} else if section == constants.DataSection {
 				source.AppendData(sourceLine)
 			} else {
-				err := pherror.Join(pherror.DecoratorNotFound, fileError)
-				panic(pherror.Format(err, sourceLine.Name))
+				panic(sourceLine.Errorf(pherror.DecoratorNotFound, sourceLine.Name))
 			}
 		}
 	}

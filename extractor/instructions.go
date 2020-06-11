@@ -97,9 +97,15 @@ func extractData(content []*input.SourceLine) *[]Data {
 	var datas = make([]Data, 0)
 
 	for _, data := range content {
+		value, err := strconv.Atoi(data.Operand)
+
+		if err != nil {
+			panic(data.Errorf(pherror.InvalidOperandValue, data.Operand))
+		}
+
 		newData := Data{
-			Value:   data.Address,
-			Address: data.LineNumber,
+			Value:   value,
+			Address: data.Address,
 		}
 
 		datas = append(datas, newData)

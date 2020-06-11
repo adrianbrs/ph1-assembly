@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -14,34 +13,29 @@ import (
 
 // Options armazenam as opções do montador
 type Options struct {
-	Input    string
-	Output   string
-	Compress bool
+	InputFile  string
+	OutputFile string
+	Compress   bool
 }
 
 // Mount lê um arquivo fonte em assembly PH1 e monta para linguagem de máquina
 // no padrão do emulador PH1
 func Mount(opt *Options) {
+	// Inicializa os logs de erro
+	pherror.Setup(opt.InputFile)
+
 	// Validação para permitir que o usuário tente mais vezes caso o nome do arquivo esteja
 	// errado
-	source, err := input.ReadSource(opt.Input)
-	for err != nil {
-		var perr *os.PathError
-		if errors.As(err, &perr) {
-			panic(pherror.Format(pherror.FileNotFound, opt.Input))
-		} else {
-			panic(pherror.Format(pherror.CannotOpenFile, opt.Input))
-		}
-	}
+	Input := input.ReadSource(opt.InputFile)
 
 	// Primeira passagem: labels
-	labels := extractor.ExtractLabels(source)
+	labels := extractor.ExtractLabels(Input)
 
 	// Segunda passagem: instruções
-	instructions, data := extractor.ExtractInstructionsAndData(source, labels)
+	instructions, data := extractor.ExtractInstructionsAndData(Input, labels)
 
 	// Gera o arquivo de saída a partir do nome definido no options
-	output.CreateOutputFile(*instructions, *data, opt.Output)
+	output.CreateOutputFile(*instructions, *data, opt.OutputFile)
 }
 
 func main() {
@@ -76,9 +70,9 @@ func main() {
 	}
 
 	options := &Options{
-		Input:    input,
-		Output:   output,
-		Compress: false,
+		InputFile:  input,
+		OutputFile: output,
+		Compress:   false,
 	}
 
 	Mount(options)
