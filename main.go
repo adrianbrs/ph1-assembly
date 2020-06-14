@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"ph1-assembly/constants"
 	"ph1-assembly/extractor"
 	"ph1-assembly/input"
 	"ph1-assembly/output"
@@ -66,7 +67,7 @@ func main() {
 	} else {
 
 		// Gera o output através do nome do arquivo
-		output = strings.Split(filepath.Base(input), ".")[0] + ".ph1"
+		output = strings.Split(filepath.Base(input), ".")[0] + constants.OutputExtension
 	}
 
 	options := &Options{

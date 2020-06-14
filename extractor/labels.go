@@ -1,6 +1,7 @@
 package extractor
 
 import (
+	"ph1-assembly/constants"
 	"ph1-assembly/input"
 )
 
@@ -11,13 +12,13 @@ func ExtractLabels(src *input.Source) map[string]int {
 
 	// Encontra as labels
 	for _, srcText := range src.Text {
-		if srcText.Label != "" {
+		if srcText.Label != constants.Empty {
 			labels[srcText.Label] = srcText.Address
 		}
 	}
 
 	for _, srcData := range src.Data {
-		if srcData.Label != "" {
+		if srcData.Label != constants.Empty {
 			labels[srcData.Label] = srcData.Address
 		}
 	}

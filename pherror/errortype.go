@@ -32,16 +32,16 @@ func (err *ErrorType) Error() string {
 	}
 
 	// Verifica se há um nome de arquivo no erro
-	if err.Filename != "" || err.LineNumber != 0 {
+	if err.Filename != constants.Empty || err.LineNumber != 0 {
 		var filename string
 
-		if err.Filename != "" {
+		if err.Filename != constants.Empty {
 			filename = err.Filename
-		} else if inputFileName != "" {
+		} else if inputFileName != constants.Empty {
 			filename = inputFileName
 		}
 
-		if filename != "" {
+		if filename != constants.Empty {
 			msg += " in %s"
 			args = append(args, filename)
 
@@ -69,13 +69,13 @@ func Join(errTypes ...*ErrorType) *ErrorType {
 		if err.Code != 0 {
 			retErr.Code = err.Code
 		}
-		if err.Filename != "" {
+		if err.Filename != constants.Empty {
 			retErr.Filename = err.Filename
 		}
 		if err.LineNumber != 0 {
 			retErr.LineNumber = err.LineNumber
 		}
-		if err.Message != "" {
+		if err.Message != constants.Empty {
 			retErr.Message = err.Message
 		}
 	}

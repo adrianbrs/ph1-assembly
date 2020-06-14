@@ -41,6 +41,7 @@ func extractInstructions(content *input.Source, labelMap map[string]int) *[]Inst
 	textContent := content.Text
 	for _, srcLine := range textContent {
 
+		// Caso a linha contenha os textos 'text' e 'data' pula essa iteração
 		if srcLine.Name == constants.TextSection || srcLine.Name == constants.DataSection {
 			continue
 		}
@@ -74,7 +75,7 @@ func extractDataLabel(dataContent []*input.SourceLine, labelMap map[string]int,
 	// Busca nos labels o valor do operando
 	operandValue, found := labelMap[instructionInfo.Operand]
 
-	// Caso não encontre tente converter para inteiro, visto que pode ser o próprio valor
+	// Caso não encontre tenta converter para inteiro, visto que pode ser o próprio valor
 	// ao invés de um rótulo
 	if found == false {
 		var err error
@@ -85,6 +86,7 @@ func extractDataLabel(dataContent []*input.SourceLine, labelMap map[string]int,
 		}
 	}
 
+	// Cria um novo objeto Data
 	data := &Data{
 		Value:   operandValue,
 		Address: instructionInfo.Address + 1,
@@ -96,13 +98,16 @@ func extractDataLabel(dataContent []*input.SourceLine, labelMap map[string]int,
 func extractData(content []*input.SourceLine) *[]Data {
 	var datas = make([]Data, 0)
 
+	// Itera sobre a lista de SourceLines em busca dos valores contidos na section Data
 	for _, data := range content {
+		//Converte o valor contido no Operand para inteiro
 		value, err := strconv.Atoi(data.Operand)
 
 		if err != nil {
 			panic(data.Errorf(pherror.InvalidOperandValue, data.Operand))
 		}
 
+		// Cria um novo objeto Data
 		newData := Data{
 			Value:   value,
 			Address: data.Address,
