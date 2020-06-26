@@ -37,7 +37,6 @@ func ExtractInstructionsAndData(content *input.Source, labelMap map[string]int) 
 func extractInstructions(content *input.Source, labelMap map[string]int) *[]Instruction {
 	var instructions = make([]Instruction, 0)
 
-	dataContent := content.Data
 	textContent := content.Text
 	for _, srcLine := range textContent {
 
@@ -54,9 +53,9 @@ func extractInstructions(content *input.Source, labelMap map[string]int) *[]Inst
 		}
 
 		// Verifica se o valor retornado da decodificação para aquela instrução é 1 ou 2
-		if size == 2 {
+		if size == 2 && srcLine.Operand != "" {
 			instruction.HasOperand = true
-			instruction.Data = extractDataLabel(dataContent, labelMap, srcLine)
+			instruction.Data = extractDataLabel(labelMap, srcLine)
 		}
 
 		// Adiciona a instrução na lista e executa o laço novamente
@@ -68,7 +67,7 @@ func extractInstructions(content *input.Source, labelMap map[string]int) *[]Inst
 }
 
 // Procura no label map o valor do operando
-func extractDataLabel(dataContent []*input.SourceLine, labelMap map[string]int,
+func extractDataLabel(labelMap map[string]int,
 	instructionInfo *input.SourceLine) *Data {
 
 	// Busca nos labels o valor do operando
@@ -81,7 +80,7 @@ func extractDataLabel(dataContent []*input.SourceLine, labelMap map[string]int,
 		operandValue, err = strconv.Atoi(instructionInfo.Operand)
 
 		if err != nil {
-			panic(pherror.Format(pherror.LabelNotFound, instructionInfo.Operand))
+			panic(instructionInfo.Errorf(pherror.LabelNotFound, instructionInfo.Operand))
 		}
 	}
 

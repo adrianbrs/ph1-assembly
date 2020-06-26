@@ -2,6 +2,7 @@ package decoder
 
 import (
 	"ph1-assembly/pherror"
+	"strings"
 )
 
 type metaInstruction struct {
@@ -18,8 +19,8 @@ var operations = map[string]*metaInstruction{
 	"SUB": &metaInstruction{opCode: "40", size: 2},
 	"MUL": &metaInstruction{opCode: "50", size: 2},
 	"DIV": &metaInstruction{opCode: "60", size: 2},
-	"NOT": &metaInstruction{opCode: "70", size: 2},
-	"AND": &metaInstruction{opCode: "80", size: 1},
+	"NOT": &metaInstruction{opCode: "70", size: 1},
+	"AND": &metaInstruction{opCode: "80", size: 2},
 	"OR":  &metaInstruction{opCode: "90", size: 2},
 	"XOR": &metaInstruction{opCode: "A0", size: 2},
 	"JMP": &metaInstruction{opCode: "B0", size: 2},
@@ -32,7 +33,7 @@ var operations = map[string]*metaInstruction{
 // DecodeText traduz o mnemônico de uma instrução e retorna
 // seu opcode e tamanho
 func DecodeText(name string) (string, int) {
-	instruction := operations[name]
+	instruction := operations[strings.ToUpper(name)]
 
 	if instruction == nil {
 		panic(pherror.Format(pherror.NoneInstructionFound, name))
