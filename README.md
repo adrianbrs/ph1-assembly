@@ -1,6 +1,5 @@
 # ph1-assembly
-## Simula um montador da arquitetura de computador PH1 da disciplina de Arquitetura e Organização de
-Computadores I - Universidade de Passo Fundo
+## Simula um montador da arquitetura de computador PH1 da disciplina de Arquitetura e Organização de Computadores I - Universidade de Passo Fundo
 
 --- 
 
