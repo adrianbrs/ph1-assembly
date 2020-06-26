@@ -16,4 +16,10 @@ const (
 	// MaxErrorCodeDigits define a quantidade máxima de digitos para
 	// o código de um erro do montador
 	MaxErrorCodeDigits = 3
+
+	// Empty representa uma string vazia
+	Empty = ""
+
+	// OutputExtension extensão do arquivo de saída
+	OutputExtension = ".ph1"
 )

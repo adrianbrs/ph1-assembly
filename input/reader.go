@@ -91,7 +91,7 @@ func ReadSource(filename string) (source *Source) {
 	// Cria um erro relacionado ao arquivo
 	fileError := &pherror.ErrorType{Filename: filename}
 
-	// Lẽ cada linha salvanda na seção atual
+	// Lê cada linha salvando na seção atual
 	for lineNumber, line := range contents {
 		// Atualiza a linha atual do erro de arquivo
 		fileError.LineNumber = lineNumber + 1
@@ -123,14 +123,14 @@ func ReadSource(filename string) (source *Source) {
 
 func validateSourceLine(line string) bool {
 	line = strings.TrimSpace(line)
-	if line == "" || strings.HasPrefix(line, ";") {
+	if line == constants.Empty || strings.HasPrefix(line, ";") {
 		return false
 	}
 	return true
 }
 
 func parseSourceLine(line string) (srcLine *SourceLine) {
-	line = commentRegex.ReplaceAllString(line, "")
+	line = commentRegex.ReplaceAllString(line, constants.Empty)
 	line = spacesRegex.ReplaceAllString(line, " ")
 	line = strings.TrimSpace(line)
 	match := lineMatchRegex.FindStringSubmatch(line)
